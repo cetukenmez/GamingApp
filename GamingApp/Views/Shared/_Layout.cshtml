@@ -1,0 +1,159 @@
+﻿@using GamingApp.Models
+
+@{
+    string msg = "";
+
+    if (TempData["KayitBasarili"] != null)
+    {
+        msg = (TempData.Get<ResultMessage>("KayitBasarili").Message).ToString();
+    }
+
+    int ORG_ID = 0;
+    if (ViewData["ORG_ID"] != null)
+    {
+        ORG_ID = Convert.ToInt32(ViewData["ORG_ID"]);
+    }
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - ALIŞVERİŞLERRRRR</title>
+    <link href="~/css/bootstrap.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="~/alertModal/AlertModal.css" rel="stylesheet" />
+    <link href="~/css/KisiBasi.css" rel="stylesheet" />
+    <script src="~/js/jquery-3.0.0.js"></script>
+    <script src="~/js/bootstrap.js"></script>
+    <script src="~/alertModal/can.alerts.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <style>
+        @@media only screen and (min-width: 650px) {
+            #genelTable {
+                font-size: 20px !important;
+                font-weight: bold;
+            }
+        }
+    </style>
+
+</head>
+<body onload="onComplete();">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background:linear-gradient(315deg, #20bf55 0%, #01baef 74%);">
+        <div class="container">
+            <a id="backBtn" href="javascript: history.go(-1)"><i class="fa fa-chevron-left fa-lg backBtn" aria-hidden="true"></i></a>
+            @Html.ActionLink("ALIŞVERİŞLERRRR", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav mr-auto">
+                    <li class="nav-item">@Html.ActionLink("Organizasyonlar", "Index", "Home", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Grafikler", "GrafikIndex", "Home", null, new { @class = "nav-link" })</li>
+                    <li class="nav-item">@Html.ActionLink("Tüm Loglar", "Loglar", "Home", null, new { @class = "nav-link" })</li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid body-content" style="margin-top:10px;">
+        @RenderBody()
+    </div>
+    <div id="cover-spin"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.2/velocity.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.2/velocity.ui.min.js"></script>
+    <script>
+        $(".modal").each(function (l) { $(this).on("show.bs.modal", function (l) { var o = $(this).attr("data-easein"); "shake" == o ? $(".modal-dialog").velocity("callout." + o) : "pulse" == o ? $(".modal-dialog").velocity("callout." + o) : "tada" == o ? $(".modal-dialog").velocity("callout." + o) : "flash" == o ? $(".modal-dialog").velocity("callout." + o) : "bounce" == o ? $(".modal-dialog").velocity("callout." + o) : "swing" == o ? $(".modal-dialog").velocity("callout." + o) : $(".modal-dialog").velocity("transition." + o) }) });
+
+        function LoadURLIntoDiv(linkId, divId, url, parameterList, message, callBack) {
+            if (IsNotNull(parameterList)) {
+                var urlParameter = GetRequestParameters(parameterList);
+                if (urlParameter == '-1') {
+                    alerts.HataAlert("Uyarı", message);
+                    $('#' + linkId).attr('data-clickable', '0');
+                }
+                else
+                    $('#' + linkId).attr('data-clickable', '1');
+
+                url += urlParameter;
+            }
+
+
+            $("#" + divId).load(url, function (response, status, xhr) {
+                if (typeof callBack === "function")
+                    callBack();
+                if (status == "error") {
+                    var metin = "";
+                    var bas = response.indexOf("[Exception:");
+                    if (bas > 0 && response.length > 11) {
+                        metin = response.substring(bas + 11);
+                        var bit = metin.indexOf("]");
+                        if (bit > 0)
+                            metin = metin.substring(0, bit);
+                    }
+                    if (metin.length > 0)
+                        alerts.HataAlert("Hata", metin);
+                    else
+                        alerts.HataAlert("Hata", 'Sayfa yüklenirken hata oluştu');
+                    return false;
+                }
+            });
+            return true;
+        }
+
+        function IsNull(obj) {
+            ///<summary>
+            ///nesne boş/tanımsız mı?
+            ///</summary>
+            try {
+                return obj === null || obj === "undefined" || obj.length < 1;
+            } catch (exception) {
+                return true;
+            }
+        }
+        function IsNotNull(obj) {
+            ///<summary>
+            ///nesne boş/tanımsız değil mi?
+            ///</summary>
+            return !IsNull(obj);
+        }
+
+        function onLoading() {
+            $("#cover-spin").show();
+        }
+
+        function onComplete() {
+            setTimeout(function () { $("#cover-spin").hide(); }, 500);
+        }
+
+        $(document).ajaxSend(function () {
+            onLoading();
+        });
+
+        $(document).ajaxComplete(function () {
+            onComplete();
+            // place code to be executed on completion of last outstanding ajax call here
+        });
+
+
+        $(document).ready(function () {
+            if ('@msg' != "") {
+                alerts.HataAlert("Hata", '@msg');
+            }
+            $("#btnHideModal").click(function () {
+                $("#errorModal").modal('hide');
+            });
+        });
+
+    </script>
+
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+﻿@model GamingApp.Entity.Game
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="AdminDegistir">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="GameId" />
+            <input type="hidden" asp-for="GameName" />
+            <input type="hidden" asp-for="GameClosed" />
+            <input type="hidden" asp-for="CreateDate" />
+            <div class="form-group">
+                <label asp-for="GameAdminUserId" class="control-label"></label>
+                <select asp-for="GameAdminUserId" class="form-control" asp-items="ViewBag.UserId"></select>
+                <span asp-validation-for="GameAdminUserId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Kaydet" class="btn btn-success" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a href="~/Home/OrganizasyonDetay/@Convert.ToInt32(Model.GameId)">Geri Dön</a>
+</div>
+

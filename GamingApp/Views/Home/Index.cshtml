@@ -1,0 +1,42 @@
+﻿@model IEnumerable<GamingApp.Entity.Game>
+<div class="padpx10 mobil">
+    <a href="~/Home/YeniOrganizasyon" class="btn btn-outline-success" style="margin-bottom:10px;">Organizasyon Ekle</a>
+    @{
+        foreach (var item in Model)
+        {
+            <div id="myTr">
+                <div id="myTd">
+                    <a onclick="homeBtnClick();" href="~/Home/OrganizasyonDetay/@item.GameId" class="gButton button"><span>@item.GameName <i>( @string.Format("{0:dd/MM/yyyy HH:mm:ss}", item.CreateDate) )</i></span></a>
+
+                </div>
+            </div>
+        }
+    }
+</div>
+<style>
+    .button {
+        padding: 15px 10px 15px 15px;
+        width: calc(100%);
+        cursor: pointer;
+        background: #fbfbfb;
+        border: 2px solid #d6d5d5;
+        text-decoration: none;
+        color: #2d3e50;
+        font-size: 20px;
+        text-align: left;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+        .button:before {
+            font-family: Flaticon;
+            font-size: 30px;
+            font-style: normal;
+            margin-right: 20px;
+            color: #2d3e50;
+        }
+
+        .button:hover {
+            text-decoration: none;
+        }
+</style>

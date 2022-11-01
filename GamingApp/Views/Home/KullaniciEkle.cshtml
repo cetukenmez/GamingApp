@@ -1,0 +1,60 @@
+﻿@model GamingApp.Models.OrganizasyonUserModel
+@using GamingApp.Entity 
+@{
+    ViewBag.Title = "KullaniciEkle";
+    var counter = 0;
+
+    string ORG_ID = "";
+
+    if (ViewData["ORG_ID"] != null)
+    {
+        ORG_ID = ViewData["ORG_ID"].ToString();
+    }
+
+}
+
+<form method="post" style="padding: 30px;">
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-12">
+            @{
+                foreach (var item in (List<User>)ViewBag.Oyuncular)
+                {
+                    var IsCheck = "";
+                    if (Model.SeciliOyuncular.Any(i => i.UserId == item.UserId))
+                    {
+                        IsCheck = "checked";
+                        <input type="hidden" name="SeciliOyuncular[@counter].Id" value="@item.UserId" />
+                        <input type="hidden" name="SeciliOyuncular[@counter].UserName" value="@item.UserId" />
+                        counter++;
+
+                    }
+                    else
+                    {
+                        IsCheck = "";
+                    }
+
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" name="oyuncuIds" value="@item.UserId" class="custom-control-input" id="oyuncu@(item.UserId)" @IsCheck>
+                        <label class="custom-control-label" for="oyuncu@(item.UserId)">@item.UserNameSurname</label>
+                    </div>
+
+
+                }
+            }
+
+            <input type="hidden" name="GameId" value="@Model.Id" />
+            <div class="form-group row" style="margin-top:10px;">
+                <div class="col-md-12">
+                    <button class="btn btn-outline-success" type="submit">Kullanıcıları Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</form>
+
+<div>
+    <a href="~/Home/OrganizasyonDetay/@Convert.ToInt32(ORG_ID)">Geri Dön</a>
+</div>

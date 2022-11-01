@@ -1,0 +1,39 @@
+﻿@model IEnumerable<GamingApp.Entity.SessionUser>
+@{
+    string SESSION_ID = "";
+    if (ViewData["SESSION_ID"] != null)
+    {
+        SESSION_ID = ViewData["SESSION_ID"].ToString();
+    }
+
+
+    string TOPLAM_ALINAN = "0";
+    if (ViewData["TOPLAM_ALINAN"] != null)
+    {
+        TOPLAM_ALINAN = ViewData["TOPLAM_ALINAN"].ToString();
+    }
+}
+
+
+
+
+<div>
+    <strong>@SESSION_ID</strong>
+    <label>Bu seansda şu ana kadar toplam alınan çip tutarı : @TOPLAM_ALINAN TL</label> <br />
+    <input hidden value="@TOPLAM_ALINAN" id="toplamAlinan" />
+    <input hidden value="@SESSION_ID" id="sessionId" />
+
+    <div class="form-horizontal">
+        @{ foreach (var item in Model)
+            {
+                <div class="form-group satir">
+                    <label class="control-label col-md-3">@item.User.UserNameSurname </label>
+                    <div class="col-md-9">
+                        <input type="number" value="0" id="cashOut" class="artilar form-control" data-userid="@item.UserId" data-suid="@item.SessionUserId" />
+                    </div>
+                </div>
+            }
+        }
+        <input onclick="seansBitir();" value="Kaydet" type="button" />
+    </div>
+</div>

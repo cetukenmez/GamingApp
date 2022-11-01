@@ -1,0 +1,274 @@
+﻿<style>
+    .chartdiv {
+        background-color: #f8f8f8;
+        box-shadow: 0 10px 20px 5px rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        height: calc(100vh/1.1);
+    }
+</style>
+
+
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+<script>
+
+    function drawChart() {
+        var url = "@Url.Action("TumZamanlar", "Home")";
+        $.ajax({
+            method: 'GET',
+            dataType: 'json',
+            url: url,
+            data: { },
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            },
+            success: function (items) {
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+
+                // Create chart instance
+                var chart = am4core.create("chart_div_line_gunluk_sube_sayi", am4charts.XYChart);
+
+                // Add data
+                chart.data = items;
+                chart.exporting.menu = new am4core.ExportMenu();
+                chart.exporting.menu.align = "right";
+                chart.exporting.menu.verticalAlign = "top";
+                chart.exporting.filePrefix = "Durum";
+
+                //var label = chart.createChild(am4core.Label);
+                //label.text = $("#lstYil option:selected").text() + " / " + $("#lstAy option:selected").text() + " Günlük Stoğa Giren Ürün Grafiği";
+                //label.color = "#FF0000";
+                //label.align = "center"
+
+                var tablo = $("#lstYil option:selected").text() + " / " + $("#lstAy option:selected").text() + " Günlük Stoğa Giren Ürün Grafiği";
+
+                chart.exporting.filePrefix = tablo;
+
+                var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+                categoryAxis.dataFields.category = "dataTipi";
+                categoryAxis.renderer.grid.template.location = 0;
+                categoryAxis.renderer.labels.template.rotation = 0;
+                categoryAxis.renderer.minGridDistance = 10;
+
+                var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+
+                // Create series
+                var series = chart.series.push(new am4charts.ColumnSeries());
+                series.dataFields.valueX = "toplam";
+                series.dataFields.categoryY = "dataTipi";
+                series.dataFields.photo = "foto";
+
+                var columnTemplate = series.columns.template;
+                columnTemplate.tooltipText = "{categoryY}: [bold]{valueX}[/]";
+                columnTemplate.fillOpacity = .8;
+                columnTemplate.strokeOpacity = 0;
+                columnTemplate.fill = am4core.color("#5a5");
+
+                columnTemplate.adapter.add("fill", function (fill, target) {
+                    if (target.dataItem && (target.dataItem.valueX < 0)) {
+                        return am4core.color("#a55");
+                    }
+                    else {
+                        return fill;
+                    }
+                });
+
+                //var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                //categoryAxis.dataFields.category = "dataTipi";
+                //categoryAxis.renderer.grid.template.location = 0;
+                //categoryAxis.renderer.minGridDistance = 30;
+
+                //var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                //valueAxis.renderer.inside = true;
+                //valueAxis.renderer.labels.template.fillOpacity = 0.3;
+                //valueAxis.renderer.grid.template.strokeOpacity = 0;
+                //valueAxis.cursorTooltipEnabled = false;
+                //valueAxis.renderer.baseGrid.strokeOpacity = 0;
+
+                //var series = chart.series.push(new am4charts.ColumnSeries);
+                //series.dataFields.valueY = "toplam";
+                //series.dataFields.categoryX = "dataTipi";
+                //series.dataFields.photo = "foto";
+                //series.tooltipText = "{valueY.value} TL";
+                //series.tooltip.pointerOrientation = "vertical";
+                //series.tooltip.dy = - 6;
+                //series.columnsContainer.zIndex = 100;
+
+                //var columnTemplate = series.columns.template;
+                //columnTemplate.width = am4core.percent(50);
+                //columnTemplate.maxWidth = 80;
+                //columnTemplate.column.cornerRadius(60, 60, 10, 10);
+                //columnTemplate.strokeOpacity = 0;
+
+                var label = columnTemplate.createChild(am4core.Label);
+                label.text = "{valueX.value} TL";
+                label.align = "center";
+                label.valign = "middle";
+
+
+                series.heatRules.push({ target: columnTemplate, property: "fill", dataField: "valueY", min: am4core.color("#e5dc36"), max: am4core.color("#5faa46") });
+                series.mainContainer.mask = undefined;
+
+                var cursor = new am4charts.XYCursor();
+                chart.cursor = cursor;
+                cursor.lineX.disabled = true;
+                cursor.lineY.disabled = true;
+                cursor.behavior = "none";
+
+                //var bullet = columnTemplate.createChild(am4charts.CircleBullet);
+                //bullet.circle.radius = 50;
+                //bullet.valign = "bottom";
+                //bullet.align = "center";
+                //bullet.isMeasured = true;
+                //bullet.mouseEnabled = false;
+                //bullet.verticalCenter = "bottom";
+
+                var hoverState = bullet.states.create("hover");
+                var outlineCircle = bullet.createChild(am4core.Circle);
+                outlineCircle.adapter.add("radius", function (radius, target) {
+                    var circleBullet = target.parent;
+                    return circleBullet.circle.pixelRadius + 10;
+                })
+
+                //var image = bullet.createChild(am4core.Image);
+                //image.width = 100;
+                //image.height = 100;
+                //image.horizontalCenter = "middle";
+                //image.verticalCenter = "middle";
+
+                //image.adapter.add("href", function (href, target) {
+                //    var dataItem = target.dataItem;
+                //    if (dataItem) {
+                //        debugger;
+                //        return "../images/" + dataItem.photo.toLowerCase();
+                //    }
+                //})
+
+                //image.adapter.add("mask", function (mask, target) {
+                //    var circleBullet = target.parent;
+                //    return circleBullet.circle;
+                //})
+
+                var previousBullet;
+                chart.cursor.events.on("cursorpositionchanged", function (event) {
+                    var dataItem = series.tooltipDataItem;
+
+                    if (dataItem.column) {
+                        var bullet = dataItem.column.children.getIndex(1);
+
+                        if (previousBullet && previousBullet != bullet) {
+                            previousBullet.isHover = false;
+                        }
+
+                        if (previousBullet != bullet) {
+
+                            var hs = bullet.states.getKey("hover");
+                          //  hs.properties.dy = -bullet.parent.pixelHeight + 30;
+                            bullet.isHover = true;
+
+                            previousBullet = bullet;
+                        }
+                    }
+                })
+            },
+            error: function () {
+                alert("Column Chart Yüklenirken Bir Hata Meydana Geldi");
+            }
+
+        });
+    }
+
+
+</script>
+
+
+
+<div style="padding-top:45px">
+    @*<div class="row col-md-8" style="padding:25px;margin-left:25px">
+        <select id="lstYil" class="form-control-sm col-md-3 mr-2">
+            @{
+                for (int i = 2019; i <= DateTime.Now.Year; i++)
+                {
+                    <option value="@i">@i</option>
+
+                }
+
+            }
+        </select>
+
+        <select id="lstAy" class="form-control-sm col-md-3  mr-2">
+            <option value="1">Ocak</option>
+            <option value="2">Şubat</option>
+            <option value="3">Mart</option>
+            <option value="4">Nisan</option>
+            <option value="5">Mayıs</option>
+            <option value="6">Haziran</option>
+            <option value="7">Temmuz</option>
+            <option value="8">Ağustos</option>
+            <option value="9">Eylül</option>
+            <option value="10">Ekim</option>
+            <option value="11">Kasım</option>
+            <option value="12">Aralık</option>
+        </select>
+
+        <button id="btnAra" type="submit" class="col-md-3 btn-sm btn btn-outline-success"><i class="fas fa-filter"></i>&nbsp;Uygula</button>
+    </div>*@
+
+    <div style="padding:5px 0">
+        <div class="row" style="margin-top:5px">
+            <div id="chart_div_line_gunluk_sube_sayi" name="chart_div_line_gunluk_sube_sayi" class="col-md-12 chartdiv"></div>
+        </div>
+    </div>
+    @*<div class="row col-md-12">
+            <div id="chart_div_pie" name="chart_div_pie" class="col-lg-12 chartdiv" style="height: 500px;"></div>
+        </div>
+
+        <div class="row col-md-12 mt-5">
+            <div id="chart_div" name="chart_div" class="col-md-12 chartdiv" style="height: 500px;"></div>
+        </div>
+
+        <div class="row col-md-12 mt-5">
+            <div id="chart_div_line" name="chart_div_line" class="col-md-12 chartdiv"></div>
+        </div>*@
+</div>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js'></script>
+<script>
+    $(document).ready(function () {
+
+        var d = new Date($.now());
+        var month = (d.getMonth() + 1);
+        var year = (d.getFullYear());
+        $("#lstAy").val(month);
+        $("#lstYil").val(year);
+        drawChart();
+    });
+
+
+
+
+</script>
+
+<script>
+
+    $("#btnAra").click(function () {
+
+        var month = $("#lstAy option:selected").val();
+        var year = $("#lstYil option:selected").val();
+        if (month < 1 || month > 13) {
+            alert("Lütfen geçerli bir ay seçiniz")
+        }
+        else if (year < 1) {
+            alert("Lütfen bir yıl seçiniz")
+        }
+        else {
+            drawChart();
+
+        }
+    });
+
+
+</script>
+
+

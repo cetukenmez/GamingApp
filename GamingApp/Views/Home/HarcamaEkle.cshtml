@@ -1,0 +1,19 @@
+﻿@model GamingApp.Entity.SessionUser
+@{
+    string user = "";
+    if (ViewBag.User != null)
+    {
+        user = ViewBag.User;
+    }
+}
+
+
+
+
+<div>
+    <strong>@user</strong>
+    <label>Bu seansda şu ana kadar alınan : @Model.Cash.ToString("0.##") TL</label> <br />
+    <label>Ne kadar Alınacak : </label>
+    <input value="50" id="neKadarAldi" type="number"/>
+    <input onclick="harcamaKaydet(@Model.SessionUserId);" value="Kaydet" type="button" />
+</div>
